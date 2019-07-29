@@ -29,9 +29,10 @@ namespace BasketballStatTracker.Windows
             }
             var teamOnePlayers = textBoxes.Where(x => x.Name.Contains("Team1")).Select(x => new Player(x.Text));
             var teamTwoPlayers = textBoxes.Where(x => x.Name.Contains("Team2")).Select(x => new Player(x.Text));
-            var teamOne = new Team(teamOnePlayers.Where(x => x.Name != ));
-            var teamTwo = new Team(teamTwoPlayers.ToList());
+            var teamOne = new Team(teamOnePlayers.OrderBy(x => x.Name).ToList());
+            var teamTwo = new Team(teamTwoPlayers.OrderBy(x => x.Name).ToList());
             Game = new Game(teamOne, teamTwo);
+            this.Close();
         }
     }
 }

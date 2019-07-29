@@ -6,8 +6,10 @@
         xmlns:local="clr-namespace:BasketballStatTracker"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" Background="CadetBlue">
-    <Grid>
+    <Grid x:Name="PlayerGrid">
         <Button Content="Create New Game" HorizontalAlignment="Left" Margin="332,55,0,0" VerticalAlignment="Top" Width="117" x:Name="CreateNewGameButton" Click="CreateNewGameButton_Click"/>
-
+        <StackPanel x:Name="MainStackPanel" Orientation="Vertical">
+            
+        </StackPanel>
     </Grid>
 </Window>
