@@ -5,10 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BasketballStatTracker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Background="CadetBlue">
+        Title="MainWindow" Height="900" Width="1000" Background="CadetBlue">
     <Grid x:Name="PlayerGrid">
-        <Button Content="Create New Game" HorizontalAlignment="Left" Margin="332,55,0,0" VerticalAlignment="Top" Width="117" x:Name="CreateNewGameButton" Click="CreateNewGameButton_Click"/>
-        <StackPanel x:Name="MainStackPanel" Orientation="Vertical">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"></RowDefinition>
+            <RowDefinition Height="800"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Button Content="Create New Game" HorizontalAlignment="Left" Margin="332,55,0,0" VerticalAlignment="Top" Width="117" x:Name="CreateNewGameButton" Click="CreateNewGameButton_Click" Grid.Row="0"/>
+        <StackPanel x:Name="MainStackPanel" Orientation="Vertical" Grid.Row="1">
             
         </StackPanel>
     </Grid>

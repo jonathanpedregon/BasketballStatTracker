@@ -32,7 +32,8 @@ namespace BasketballStatTracker.Windows
             var teamOne = new Team(teamOnePlayers.OrderBy(x => x.Name).ToList());
             var teamTwo = new Team(teamTwoPlayers.OrderBy(x => x.Name).ToList());
             Game = new Game(teamOne, teamTwo);
-            this.Close();
+            DialogResult = true;
+            Close();
         }
     }
 }

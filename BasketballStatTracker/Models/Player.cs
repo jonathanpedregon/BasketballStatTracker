@@ -16,6 +16,13 @@
 
         public int Points => (TwoPointMakes * 2) + OnePointMakes;
 
+        public override string ToString()
+        {
+            return $"FG: {OnePointMakes + TwoPointMakes}/{OnePointAttempts + TwoPointAttempts} " +
+                $"Pts: {Points} Reb: {OffensiveRebounds + DefensiveRebounds} " +
+                $"Asst: {Assists} Blk: {Blocks} Stl: {Steals} PF: {Fouls}";
+        }
+
         public Player(string name)
         {
             Name = name;
