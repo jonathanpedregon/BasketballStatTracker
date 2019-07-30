@@ -24,13 +24,27 @@ namespace BasketballStatTracker
 
         private void CreateNewGameButton_Click(object sender, RoutedEventArgs e)
         {
-            var createGameWindow = new CreateGameWindow();
-            var successfulCreation = createGameWindow.ShowDialog();
-            if (successfulCreation != null && (bool)successfulCreation)
-            {
-                CurrentGame = createGameWindow.Game;
+            //var createGameWindow = new CreateGameWindow();
+            //var successfulCreation = createGameWindow.ShowDialog();
+            //if (successfulCreation != null && (bool)successfulCreation)
+            //{
+                //CurrentGame = createGameWindow.Game;
+                var team1Players = new List<Player>
+                    {
+                        new Player("Caleb"),
+                        new Player("Boyd")
+                    };
+                var team1 = new Team(team1Players);
+                var team2Players = new List<Player>
+                    {
+                        new Player("Dylan"),
+                        new Player("Stephen")
+                    };
+                var team2 = new Team(team2Players);
+                CurrentGame = new Game(team1, team2);
+
                 CreatGrid();
-            }
+            //}
         }
 
         private void CreatGrid()
@@ -55,20 +69,185 @@ namespace BasketballStatTracker
             var stackPanel = new StackPanel { Orientation = Orientation.Horizontal, Name = $"{player.Name}stackpanel" };
             stackPanel.Children.Add(new Label { Content = player.Name, Width = 75 });
             stackPanel.Children.Add(GetOnePointAttemptButton(player));
-
-            stackPanel.Children.Add(new Button { Content = "1 Pt Make", Margin = new Thickness(5, 0, 5, 0) });
-            stackPanel.Children.Add(new Button { Content = "2 Pt Attempt", Margin = new Thickness(5, 0, 5, 0) });
-            stackPanel.Children.Add(new Button { Content = "2 Pt Make", Margin = new Thickness(5, 0, 5, 0) });
-            stackPanel.Children.Add(new Button { Content = "Block", Margin = new Thickness(5, 0, 5, 0) });
-            stackPanel.Children.Add(new Button { Content = "Steal", Margin = new Thickness(5, 0, 5, 0) });
-            stackPanel.Children.Add(new Button { Content = "Foul", Margin = new Thickness(5, 0, 5, 0) });
+            stackPanel.Children.Add(GetOnePointMakeButton(player));
+            stackPanel.Children.Add(GetTwoPointAttemptButton(player));
+            stackPanel.Children.Add(GetTwoPointMakeButton(player));
+            stackPanel.Children.Add(GetBlockButton(player));
+            stackPanel.Children.Add(GetStealButton(player));
+            stackPanel.Children.Add(GetFoulButton(player));
             stackPanel.Children.Add(new Label { Content = player.ToString(), Name = $"{player.Name}Label" });
             return stackPanel;
         }
 
+        private Button GetFoulButton(Player player)
+        {
+            var button = new Button { Content = "Foul", Margin = new Thickness(5, 0, 5, 0), Name = $"{player.Name}_Foul", Width = 50 };
+            button.Click += new RoutedEventHandler(FoulClick);
+            return button;
+        }
+
+        private void FoulClick(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var playerName = button.Name.Split('_')[0];
+
+            var team1Player = CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team1Player != null)
+            {
+                team1Player.Fouls++;
+                RefreshPlayerStatline(playerName, team1Player);
+                return;
+            }
+            var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team2Player != null)
+            {
+                team2Player.Fouls++;
+                RefreshPlayerStatline(playerName, team2Player);
+            }
+        }
+
+        private Button GetStealButton(Player player)
+        {
+            var button = new Button { Content = "Steal", Margin = new Thickness(5, 0, 5, 0), Name = $"{player.Name}_Steal", Width = 50 };
+            button.Click += new RoutedEventHandler(StealClick);
+            return button;
+        }
+
+        private void StealClick(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var playerName = button.Name.Split('_')[0];
+
+            var team1Player = CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team1Player != null)
+            {
+                team1Player.Steals++;
+                RefreshPlayerStatline(playerName, team1Player);
+                return;
+            }
+            var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team2Player != null)
+            {
+                team2Player.Steals++;
+                RefreshPlayerStatline(playerName, team2Player);
+            }
+        }
+
+        private Button GetBlockButton(Player player)
+        {
+            var button = new Button { Content = "Block", Margin = new Thickness(5, 0, 5, 0), Name = $"{player.Name}_Block", Width= 50 };
+            button.Click += new RoutedEventHandler(BlockClick);
+            return button;
+        }
+
+        private void BlockClick(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var playerName = button.Name.Split('_')[0];
+
+            var team1Player = CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team1Player != null)
+            {
+                team1Player.Blocks++;
+                RefreshPlayerStatline(playerName, team1Player);
+                return;
+            }
+            var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team2Player != null)
+            {
+                team2Player.Blocks++;
+                RefreshPlayerStatline(playerName, team2Player);
+            }
+        }
+
+        private Button GetTwoPointMakeButton(Player player)
+        {
+            var button = new Button { Content = "2 Pt Make", Margin = new Thickness(5, 0, 5, 0), Name = $"{player.Name}_2PtMake", Width = 80 };
+            button.Click += new RoutedEventHandler(TwoPointMakeClick);
+            return button;
+        }
+
+        private void TwoPointMakeClick(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var playerName = button.Name.Split('_')[0];
+
+            var team1Player = CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team1Player != null)
+            {
+                team1Player.TwoPointMakes++;
+                team1Player.TwoPointAttempts++;
+                RefreshPlayerStatline(playerName, team1Player);
+                return;
+            }
+            var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team2Player != null)
+            {
+                team2Player.TwoPointMakes++;
+                team2Player.TwoPointAttempts++;
+                RefreshPlayerStatline(playerName, team2Player);
+            }
+        }
+
+        private Button GetTwoPointAttemptButton(Player player)
+        {
+            var button = new Button { Content = "2 Pt Attempt", Margin = new Thickness(5, 0, 5, 0), Name = $"{player.Name}_2PtAttempt", Width = 100 };
+            button.Click += new RoutedEventHandler(TwoPointAttemptClick);
+            return button;
+        }
+
+        private void TwoPointAttemptClick(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var playerName = button.Name.Split('_')[0];
+
+            var team1Player = CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team1Player != null)
+            {
+                team1Player.TwoPointAttempts++;
+                RefreshPlayerStatline(playerName, team1Player);
+                return;
+            }
+            var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team2Player != null)
+            {
+                team2Player.TwoPointAttempts++;
+                RefreshPlayerStatline(playerName, team2Player);
+            }
+        }
+
+        private Button GetOnePointMakeButton(Player player)
+        {
+            var button = new Button { Content = "1 Pt Make", Margin = new Thickness(5, 0, 5, 0), Name = $"{player.Name}_1PtMake", Width = 80 };
+            button.Click += new RoutedEventHandler(OnePointMakeButtonClick);
+            return button;
+        }
+
+        private void OnePointMakeButtonClick(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var playerName = button.Name.Split('_')[0];
+
+            var team1Player = CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team1Player != null)
+            {
+                team1Player.OnePointMakes++;
+                team1Player.OnePointAttempts++;
+                RefreshPlayerStatline(playerName, team1Player);
+                return;
+            }
+            var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
+            if (team2Player != null)
+            {
+                team2Player.OnePointMakes++;
+                team2Player.OnePointAttempts++;
+                RefreshPlayerStatline(playerName, team2Player);
+            }
+        }
+
         private Button GetOnePointAttemptButton(Player player)
         {
-            var button = new Button { Content = "1 Pt Attempt", Name = $"{player.Name}_1PtAttempt", Margin = new Thickness(5, 0, 5, 0) };
+            var button = new Button { Content = "1 Pt Attempt", Name = $"{player.Name}_1PtAttempt", Margin = new Thickness(5, 0, 5, 0), Width= 100 };
             button.Click += new RoutedEventHandler(OnePtAttemptClick);
             return button;
         }
@@ -89,13 +268,11 @@ namespace BasketballStatTracker
             {
                 team2Player.OnePointAttempts++;
                 RefreshPlayerStatline(playerName, team2Player);
-                var statLine = team2Player.ToString();
             }
         }
 
         private void RefreshPlayerStatline(string playerName, Player player)
         {
-            var mainStackPanel = MainStackPanel.Children;
             foreach (var child in MainStackPanel.Children)
             {
                 var stackpanel = child as StackPanel;
