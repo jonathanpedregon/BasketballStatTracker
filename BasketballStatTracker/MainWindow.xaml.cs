@@ -24,34 +24,20 @@ namespace BasketballStatTracker
 
         private void CreateNewGameButton_Click(object sender, RoutedEventArgs e)
         {
-            //var createGameWindow = new CreateGameWindow();
-            //var successfulCreation = createGameWindow.ShowDialog();
-            //if (successfulCreation != null && (bool)successfulCreation)
-            //{
-                //CurrentGame = createGameWindow.Game;
-                var team1Players = new List<Player>
-                    {
-                        new Player("Caleb"),
-                        new Player("Boyd")
-                    };
-                var team1 = new Team(team1Players);
-                var team2Players = new List<Player>
-                    {
-                        new Player("Dylan"),
-                        new Player("Stephen")
-                    };
-                var team2 = new Team(team2Players);
-                CurrentGame = new Game(team1, team2);
-
+            var createGameWindow = new CreateGameWindow();
+            var successfulCreation = createGameWindow.ShowDialog();
+            if (successfulCreation != null && (bool)successfulCreation)
+            {
+                CurrentGame = createGameWindow.Game;
                 CreatGrid();
-            //}
+            }
         }
 
         private void CreatGrid()
         {
-            MainStackPanel.Children.Add(new Label { Content = "Team One", FontWeight = FontWeights.Bold });
+            MainStackPanel.Children.Add(new Label { Content = "Team One: 0", FontWeight = FontWeights.Bold, Name = "Team1Label" });
             GetTeamStackPanels(CurrentGame.Team1);
-            MainStackPanel.Children.Add(new Label { Content = "Team Two", FontWeight = FontWeights.Bold });
+            MainStackPanel.Children.Add(new Label { Content = "Team Two: 0", FontWeight = FontWeights.Bold, Name = "Team2Label" });
             GetTeamStackPanels(CurrentGame.Team2);
         }
 
@@ -178,6 +164,7 @@ namespace BasketballStatTracker
                 team1Player.TwoPointMakes++;
                 team1Player.TwoPointAttempts++;
                 RefreshPlayerStatline(playerName, team1Player);
+                OpenAssistWindow(CurrentGame.Team1, team1Player);
                 return;
             }
             var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
@@ -186,6 +173,7 @@ namespace BasketballStatTracker
                 team2Player.TwoPointMakes++;
                 team2Player.TwoPointAttempts++;
                 RefreshPlayerStatline(playerName, team2Player);
+                OpenAssistWindow(CurrentGame.Team1, team1Player);
             }
         }
 
@@ -206,6 +194,7 @@ namespace BasketballStatTracker
             {
                 team1Player.TwoPointAttempts++;
                 RefreshPlayerStatline(playerName, team1Player);
+                OpenReboundWindow(CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == playerName));
                 return;
             }
             var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
@@ -213,6 +202,7 @@ namespace BasketballStatTracker
             {
                 team2Player.TwoPointAttempts++;
                 RefreshPlayerStatline(playerName, team2Player);
+                OpenReboundWindow(CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName));
             }
         }
 
@@ -234,6 +224,7 @@ namespace BasketballStatTracker
                 team1Player.OnePointMakes++;
                 team1Player.OnePointAttempts++;
                 RefreshPlayerStatline(playerName, team1Player);
+                OpenAssistWindow(CurrentGame.Team1, team1Player);
                 return;
             }
             var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
@@ -242,6 +233,7 @@ namespace BasketballStatTracker
                 team2Player.OnePointMakes++;
                 team2Player.OnePointAttempts++;
                 RefreshPlayerStatline(playerName, team2Player);
+                OpenAssistWindow(CurrentGame.Team2, team2Player);
             }
         }
 
@@ -261,6 +253,7 @@ namespace BasketballStatTracker
             {
                 team1Player.OnePointAttempts++;
                 RefreshPlayerStatline(playerName, team1Player);
+                OpenReboundWindow(CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == playerName));
                 return;
             }
             var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName);
@@ -268,6 +261,7 @@ namespace BasketballStatTracker
             {
                 team2Player.OnePointAttempts++;
                 RefreshPlayerStatline(playerName, team2Player);
+                OpenReboundWindow(CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == playerName));
             }
         }
 
@@ -284,6 +278,75 @@ namespace BasketballStatTracker
                         if (playerStackPanel != null && playerStackPanel.Name == $"{playerName}Label")
                             playerStackPanel.Content = player.ToString();
                     }
+                }
+            }
+            RefreshScore();
+        }
+
+        private void OpenAssistWindow(Team team, Player scoringPlayer)
+        {
+            var possibleAssistPlayers = team.Players.Where(x => x != scoringPlayer).ToList();
+            var assistWindow = new AssistWindow(possibleAssistPlayers);
+            assistWindow.ShowDialog();
+            var assistPlayer = assistWindow.AssistPlayer;
+            if(assistPlayer != null)
+            {
+                var team1Player = CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == assistPlayer);
+                if (team1Player != null)
+                {
+                    team1Player.Assists++;
+                    RefreshPlayerStatline(assistPlayer, team1Player);
+                    return;
+                }
+                var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == assistPlayer);
+                if (team2Player != null)
+                {
+                    team2Player.Assists++;
+                    RefreshPlayerStatline(assistPlayer, team2Player);
+                }
+            }
+        }
+
+        private void OpenReboundWindow(Player playerThatMissedShot)
+        {
+            var reboundWindow = new ReboundWindow(CurrentGame);
+            reboundWindow.ShowDialog();
+            var reboundPlayer = reboundWindow.ReboundPlayer;
+            if(reboundPlayer != null)
+            {
+                var team1Player = CurrentGame.Team1.Players.SingleOrDefault(x => x.Name == reboundPlayer);
+                if (team1Player != null)
+                {
+                    if (CurrentGame.Team1.Players.Contains(playerThatMissedShot))
+                        team1Player.OffensiveRebounds++;
+                    else
+                        team1Player.DefensiveRebounds++;
+                    RefreshPlayerStatline(reboundPlayer, team1Player);
+                    return;
+                }
+                var team2Player = CurrentGame.Team2.Players.SingleOrDefault(x => x.Name == reboundPlayer);
+                if (team2Player != null)
+                {
+                    if (CurrentGame.Team2.Players.Contains(playerThatMissedShot))
+                        team2Player.OffensiveRebounds++;
+                    else
+                        team2Player.DefensiveRebounds++;
+                    RefreshPlayerStatline(reboundPlayer, team2Player);
+                }
+            }
+        }
+
+        private void RefreshScore()
+        {
+            foreach(var child in MainStackPanel.Children)
+            {
+                var label = child as Label;
+                if(label != null)
+                {
+                    if (label.Name == "Team1Label")
+                        label.Content = $"Team One: {CurrentGame.Team1.Points}";
+                    if (label.Name == "Team2Label")
+                        label.Content = $"Team Two: {CurrentGame.Team2.Points}";
                 }
             }
         }
